@@ -1,13 +1,11 @@
 """Templates Generator for WMilvus project scaffolding and code generation."""
 
-from typing import Dict, List
-
 
 class TemplateGenerator:
     """Generator for WMilvus project boilerplate files."""
 
     @staticmethod
-    def get_folders(scaffold_type: str = "standard") -> List[str]:
+    def get_folders(scaffold_type: str = "standard") -> list[str]:
         """Return folder layout for project scaffolding."""
         return [
             "src",
@@ -18,7 +16,7 @@ class TemplateGenerator:
         ]
 
     @staticmethod
-    def get_files_blueprint(scaffold_type: str, project_name: str) -> Dict[str, str]:
+    def get_files_blueprint(scaffold_type: str, project_name: str) -> dict[str, str]:
         """Return file blueprint map relative_path -> content."""
         return {
             "pyproject.toml": f"""[project]
@@ -26,7 +24,7 @@ name = "{project_name}"
 version = "0.1.0"
 description = "WMilvus Vector Application"
 dependencies = [
-    "wmilvus",
+    "wmilvus>=0.4.0",
     "pydantic>=2.0.0",
 ]
 """,
@@ -59,7 +57,7 @@ from src.services.vector_service import index_user_face, search_nearest_faces
 
 def main():
     print("WMilvus Application Initialized")
-    user = UserFace(id="u_001", name="William Rodriguez", email="william@example.com", face_embedding=[0.1] * 128)
+    user = UserFace(id="u_001", name="William Rodriguez", email="user@example.com", face_embedding=[0.1] * 128)
     index_user_face(user)
     matches = search_nearest_faces([0.1] * 128, top_k=1)
     print(f"Top Match: {matches[0].name}")
@@ -71,6 +69,15 @@ if __name__ == "__main__":
 
 WMilvus Vector Application powered by Pydantic ORM.
 
+## Technical Stack
+
+| Component | Technology |
+|-----------|------------|
+| Vector Database | Milvus 2.4+ |
+| Vector ORM | WMilvus (>=0.4.0) |
+| Model Validation | Pydantic v2 |
+| Runtime | Python 3.10+ |
+
 ## Usage
 
 ```bash
@@ -80,7 +87,9 @@ python main.py
         }
 
     @staticmethod
-    def generate_crud_code(model_name: str = "VectorEntity", vector_dim: int = 128, fields: str = "id:str,name:str") -> str:
+    def generate_crud_code(
+        model_name: str = "VectorEntity", vector_dim: int = 128, fields: str = "id:str,name:str"
+    ) -> str:
         """Generate ready-to-run WMilvus CRUD code."""
         parsed_fields = []
         for pair in fields.split(","):
@@ -90,7 +99,7 @@ python main.py
 
         fields_block = "\n".join(parsed_fields) if parsed_fields else "    id: str\n    name: str"
 
-        return f'''from typing import List
+        return f"""from typing import List
 from pydantic import BaseModel
 from wmilvus import FieldVector, MetricType, WMilvus
 
@@ -111,4 +120,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''
+"""
