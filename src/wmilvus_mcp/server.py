@@ -31,10 +31,7 @@ def get_catalog() -> PatternsCatalog:
 
 def _is_pydantic_model(cls: ast.ClassDef) -> bool:
     """Return True if class inherits from BaseModel or ForensicModel."""
-    return any(
-        isinstance(b, ast.Name) and b.id in ("BaseModel", "ForensicModel")
-        for b in cls.bases
-    )
+    return any(isinstance(b, ast.Name) and b.id in ("BaseModel", "ForensicModel") for b in cls.bases)
 
 
 @mcp.tool()
@@ -115,11 +112,12 @@ def deploy_wmilvus_scaffolding(
 @mcp.tool()
 def get_wmilvus_architect_blueprints() -> str:
     """Complete reference with runnable code examples for every WMilvus feature."""
-    return '''=== WMilvus Architect Blueprints ===
+    return """=== WMilvus Architect Blueprints ===
 
 1. SINGLE COLLECTION Pydantic CRUD & Context Manager:
-from pydantic import BaseModel
-from wmilvus import FieldVector, MetricType, WMilvus
+from pydantic import BaseModel, Field
+from typing import Optional
+from wmilvus import FieldVector, MetricType, WMilvus, ForensicModel
 
 class Person(BaseModel):
     id: str
@@ -152,13 +150,50 @@ class BankAccountVector(ForensicModel):
 
 db.insert(account, user_id=100)
 logs = db.get_ghost_audit_log()
-'''
+
+7. AUTO-ID & INT64 PRIMARY KEYS (v0.4.0):
+class FaceEmbedding(ForensicModel):
+    id: Optional[int] = Field(None, description="Primary key AUTOINCREMENT")
+    embedding: list[float] = FieldVector(dim=512)
+
+face = db.insert(FaceEmbedding(embedding=[0.1] * 512))
+print("Auto-assigned INT64 ID:", face.id)
+
+8. DECLARATIVE QUERY BUILDER (filter_by) (v0.4.0):
+active_users = (
+    db.filter_by(status="active", age__gte=18, department__in=["AI", "Core"])
+    .limit(20)
+    .offset(0)
+    .all()
+)
+
+9. STREAMING LARGE RESULT SETS (iter_all) (v0.4.0):
+for batch in db.iter_all(batch_size=500, filter_expr='status == "active"'):
+    for item in batch:
+        print(item.id)
+
+10. PARTITION ROUTING & SEARCH (v0.4.0):
+db.create_partition("shard_2026")
+db.insert(item, partition_name="shard_2026")
+matches = db.search_similar(vector=[0.1] * 128, partition_names=["shard_2026"], top_k=5)
+
+11. BATCH AND EXPRESSION DELETION (v0.4.0):
+db.delete_batch(["id_1", "id_2", "id_3"])
+deleted_count = db.delete_by_expr('created_at < "2024-01-01"')
+
+12. CUSTOM SEARCH PARAMETERS (nprobe, ef) (v0.4.0):
+matches = db.search_similar(
+    vector=[0.1] * 128,
+    top_k=10,
+    search_params={"metric_type": "COSINE", "params": {"nprobe": 16, "ef": 64}}
+)
+"""
 
 
 @mcp.tool()
 def get_wmilvus_architect_manual() -> str:
     """Architectural manual explaining vector indexing, Milvus memory management, and forensic audit logs."""
-    return '''=== WMilvus Architectural Manual ===
+    return """=== WMilvus Architectural Manual ===
 
 1. FieldVector Annotation & Inspection:
 WMilvus uses FieldVector(...) metadata inside Pydantic models to inspect vector dimension, index algorithm (HNSW, IVF_FLAT, FLAT), and similarity metric (MetricType.COSINE, MetricType.L2, MetricType.IP).
@@ -172,7 +207,16 @@ Routing methods:
 
 3. Enterprise Ghost Audit Log (_forensic_audit_log):
 When models inherit from ForensicModel or forensic=True is enabled, WMilvus automatically logs audit entries to global _forensic_audit_log collection on INSERT, UPDATE, SOFT_DELETE, and HARD_DELETE.
-'''
+
+4. Auto-ID & Primary Key Types (v0.4.0):
+WMilvus detects INT64 vs VARCHAR primary keys. When auto_id=True or id is None with DataType.INT64, WMilvus routes to client.insert() to let Milvus allocate IDs, returning the generated entity back with populated primary key.
+
+5. Partition Routing (v0.4.0):
+Milvus partitions allow physical separation of vector data within the same collection. WMilvus methods (insert, search_similar, get_all) accept partition_names to scope queries and maximize vector scan throughput.
+
+6. Streaming vs In-Memory Querying (v0.4.0):
+For large datasets (>10,000 vectors), db.get_all() can cause memory spikes. Use db.iter_all(batch_size=N) which paginates using offset/limit or primary key cursors transparently yielding models.
+"""
 
 
 @mcp.tool()
@@ -203,6 +247,7 @@ def generate_mcp_client_config(
 
 
 # --- Daemon Management ---
+
 
 def save_pid() -> None:
     """Save server PID to file."""
