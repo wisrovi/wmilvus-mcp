@@ -1,6 +1,7 @@
 """Unit tests for WMilvus MCP Server tools."""
 
 from unittest.mock import patch
+
 from wmilvus_mcp.server import (
     deploy_wmilvus_scaffolding,
     generate_mcp_client_config,
@@ -53,6 +54,12 @@ def test_search_wmilvus_pattern() -> None:
     res = search_wmilvus_pattern("vector")
     assert "production-ready" in res
 
+    res_filter = search_wmilvus_pattern("filter_by")
+    assert "Declarative Query Builder" in res_filter
+
+    res_stream = search_wmilvus_pattern("iter_all")
+    assert "Streaming Large Result Sets" in res_stream
+
     res_empty = search_wmilvus_pattern("nonexistent_pattern_12345")
     assert "No pattern matching" in res_empty
 
@@ -61,9 +68,12 @@ def test_get_blueprints_and_manual() -> None:
     """Test fetching blueprints and architectural manual."""
     blueprints = get_wmilvus_architect_blueprints()
     assert "SINGLE COLLECTION" in blueprints
+    assert "AUTO-ID & INT64" in blueprints
+    assert "DECLARATIVE QUERY BUILDER" in blueprints
 
     manual = get_wmilvus_architect_manual()
     assert "Architectural Manual" in manual
+    assert "Auto-ID & Primary Key Types" in manual
 
 
 def test_generate_wmilvus_crud() -> None:
