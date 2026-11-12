@@ -187,6 +187,14 @@ matches = db.search_similar(
     top_k=10,
     search_params={"metric_type": "COSINE", "params": {"nprobe": 16, "ef": 64}}
 )
+
+13. WRITE PERFORMANCE & EXPLICIT FLUSH (v0.4.6):
+# Default writes do NOT force flush() to prevent server segment fragmentation:
+with WMilvus(Person, uri="http://localhost:19530", consistency_level="Strong") as db:
+    db.insert(person)
+# Administrative manual flush:
+db.flush()
+db[Person].flush()
 """
 
 
@@ -216,6 +224,9 @@ Milvus partitions allow physical separation of vector data within the same colle
 
 6. Streaming vs In-Memory Querying (v0.4.0):
 For large datasets (>10,000 vectors), db.get_all() can cause memory spikes. Use db.iter_all(batch_size=N) which paginates using offset/limit or primary key cursors transparently yielding models.
+
+7. Write Performance, Segments & Consistency Levels (v0.4.6):
+Milvus automatically flushes and seals growing segments in background. Frequent forced flush() calls trigger excessive compaction and high I/O latency. In WMilvus v0.4.6+, writes do not flush automatically. Use consistency_level="Strong" or "Session" for immediate read-after-write visibility without flushing.
 """
 
 
