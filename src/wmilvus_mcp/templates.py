@@ -24,7 +24,7 @@ name = "{project_name}"
 version = "0.1.0"
 description = "WMilvus Vector Application"
 dependencies = [
-    "wmilvus>=0.4.0",
+    "wmilvus>=0.4.6",
     "pydantic>=2.0.0",
 ]
 """,
