@@ -14,13 +14,14 @@
 
 **wmilvus-mcp** is the Model Context Protocol (MCP) server for architecting, validating, scaffolding, and generating code for **WMilvus** vector database applications.
 
-## Technical Stack
+## Key Technologies and Libraries
 
 | Component | Technology |
 |-----------|------------|
 | Language | Python 3.10+ |
 | Protocol Core | Model Context Protocol (MCP) |
 | Server Framework | FastMCP (mcp.server.fastmcp) |
+| Target ORM Library | WMilvus (v0.4.6+) |
 | Validation Engine | AST & Pydantic 2.x |
 | Testing Framework | pytest, pytest-cov |
 | Code Formatting | ruff |
@@ -29,9 +30,9 @@
 
 1. `validate_model_schema` — Validate Pydantic models for WMilvus compatibility.
 2. `search_wmilvus_pattern` — Search production-ready WMilvus design patterns.
-3. `deploy_wmilvus_scaffolding` — Deploy a complete WMilvus vector application structure.
-4. `get_wmilvus_architect_blueprints` — Runnable code reference for CRUD, vector search, range search, batch ingestion, async client, and ghost audit log.
-5. `get_wmilvus_architect_manual` — Comprehensive architectural manual for Milvus memory and vector indexing.
+3. `deploy_wmilvus_scaffolding` — Deploy a complete WMilvus vector application structure (configured with `wmilvus>=0.4.6`).
+4. `get_wmilvus_architect_blueprints` — Runnable code reference for CRUD, vector search, range search, batch ingestion, async client, ghost audit log, and v0.4.6 non-blocking write performance.
+5. `get_wmilvus_architect_manual` — Comprehensive architectural manual for Milvus memory, vector indexing, segment flushing, and consistency levels.
 6. `generate_wmilvus_crud` — Generate ready-to-run CRUD code for WMilvus models.
 7. `generate_mcp_client_config` — Generate JSON configuration snippet for Anthropic Claude, Antigravity, or Cursor.
 
