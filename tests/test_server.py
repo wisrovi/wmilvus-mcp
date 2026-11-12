@@ -70,10 +70,12 @@ def test_get_blueprints_and_manual() -> None:
     assert "SINGLE COLLECTION" in blueprints
     assert "AUTO-ID & INT64" in blueprints
     assert "DECLARATIVE QUERY BUILDER" in blueprints
+    assert "WRITE PERFORMANCE & EXPLICIT FLUSH" in blueprints
 
     manual = get_wmilvus_architect_manual()
     assert "Architectural Manual" in manual
     assert "Auto-ID & Primary Key Types" in manual
+    assert "Write Performance, Segments & Consistency Levels" in manual
 
 
 def test_generate_wmilvus_crud() -> None:
